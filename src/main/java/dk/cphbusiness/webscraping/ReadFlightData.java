@@ -20,7 +20,7 @@ public class ReadFlightData {
     ObjectMapper om = new ObjectMapper();
 
     public void readFile() {
-        String fileName = "multiflight.json";
+        String fileName = "multiflight.json"; // from here: https://aviationstack.com/documentation
         File file = new File(getClass().getClassLoader().getResource(fileName).getFile());
         try {
             FileReader fr = new FileReader(file);
