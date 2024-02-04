@@ -1,4 +1,4 @@
-package dk.cphbusiness.webscraping;
+package dk.cphbusiness.webscraping.solutions;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

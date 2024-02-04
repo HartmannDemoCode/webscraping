@@ -5,8 +5,13 @@ import lombok.*;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class WeatherMap {
@@ -15,6 +20,7 @@ public class WeatherMap {
 
     public static void main(String[] args) {
         WeatherMap wm = new WeatherMap();
+        wm.getResponseBody2("https://jsonplaceholder.typicode.com/todos/1");
         String key = System.getenv("WEATHER_MAP_KEY");
         GeoLocationDTO location = wm.getLocation("Lyngby", key); // Get location from city name. Format: [{"name":"Kongens Lyngby","local_names":{"lt":"Liungbiu","da":"Kongens Lyngby"},"lat":55.7718649,"lon":12.5051413,"country":"DK","state":"Capital Region of Denmark"}]
 
@@ -25,10 +31,12 @@ public class WeatherMap {
 
         // With JsonObject:
         JsonObject locationWithJsonObject = wm.getWeatherWithJsonObject(location.getLat(), location.getLon(), key);
+
         System.out.println("Temperature from JsonObject: " + locationWithJsonObject.get("temperature"));
     }
 
     private String getResponseBody(String url) {
+        // Using OkHttp: Can sometime cause program to hang. Then use Apache HttpClient instead.
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         Request request = new Request.Builder()
                 .url(url)
@@ -38,7 +46,21 @@ public class WeatherMap {
         try {
             response = client.newCall(request).execute();
             String res = response.body().string();
+            System.out.println();
             return res;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private String getResponseBody2(String url){
+        // Alternative to OkHttpClient
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            String html = new String(response.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
+            System.out.println(html);
+            return html;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
