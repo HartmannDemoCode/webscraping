@@ -45,8 +45,7 @@ public class MovieDBEx {
                 String mpaa = movie.select("li > div > div > div > div > span:nth-child(3)").get(0).text();
                 String rating = movie.select("li > div > div > div > span > div > span.ipc-rating-star").get(0).text();
 
-                MovieDTO.MovieDTOBuilder builder = MovieDTO.builder();
-                MovieDTO movieDTO = builder
+                MovieDTO movieDTO = MovieDTO.builder()
                         .title(movie.select("h3.ipc-title__text").text().split(" ")[1])
                         .imdbId(movie.select("a.ipc-title-link-wrapper").attr("href").split("/")[2])
                         .thumbnailUrl(movie.select("img.ipc-image").attr("src"))
@@ -84,10 +83,10 @@ public class MovieDBEx {
             JsonObject firstMovie = jsonObject.get("movie_results").getAsJsonArray().get(0).getAsJsonObject();
             String overview = firstMovie.get("overview").getAsString();
             String releaseDate = firstMovie.get("release_date").getAsString();
-            movieDTO.setOverview(overview);
-            movieDTO.setReleaseDate(LocalDate.parse(releaseDate));
-            return new MovieDTO(movieDTO); // return a copy
-//            return res;
+            MovieDTO newMovie = new MovieDTO(movieDTO); // return a copy
+            newMovie.setOverview(overview);
+            newMovie.setReleaseDate(LocalDate.parse(releaseDate));
+            return newMovie;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
